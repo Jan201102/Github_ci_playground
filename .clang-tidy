@@ -1,0 +1,42 @@
+Checks: >
+  -*,
+
+  # Actual bug finding
+  clang-analyzer-*,
+  bugprone-*,
+
+  # Performance
+  performance-*,
+
+  # Modern C++
+  modernize-*,
+
+  # General code quality
+  readability-*,
+
+  # Portability
+  portability-*,
+
+  # Useful Core Guidelines checks
+  cppcoreguidelines-init-variables,
+  cppcoreguidelines-narrowing-conversions,
+  cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  cppcoreguidelines-pro-type-const-cast,
+  cppcoreguidelines-pro-type-reinterpret-cast,
+
+  # Disable noisy / opinionated checks
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-function-cognitive-complexity,
+  -modernize-use-trailing-return-type,
+  -modernize-avoid-c-arrays,
+  -readability-braces-around-statements,
+  -readability-implicit-bool-conversion,
+  -cppcoreguidelines-avoid-magic-numbers
+
+WarningsAsErrors: >
+  clang-analyzer-*,
+  bugprone-*
+
+HeaderFilterRegex: '.*'
+FormatStyle: file
