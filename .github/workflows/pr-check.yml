@@ -20,7 +20,7 @@ jobs:
       - name: Run Clang Tidy check
         run: |
           echo "Clang tidy checks successfully triggered by Pull Request!"
-          clang-tidy *.cpp -system-headers=0 -- -std=c++17 < clang_report.txt || true
+          clang-tidy *.cpp -system-headers=0 -- -std=c++17 > clang_report.txt || true
           USER_WARNINGS=$(grep -c "warning:\|error:" clang_report.txt || true)
           #total linwa of code
           TOTAL_LOC=$(find . -type f \( -name "*.cpp" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.h" \) -not -path "*/.*" -exec cat {} + | wc -l)
