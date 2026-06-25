@@ -5,13 +5,54 @@ on:
     branches: [main]
 
 jobs:
-  run_tests:
+  run-linter:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-
-      - name: Run a placeholder check
+      - name: Install Clang-Tidy
         run: |
-          echo "Github Action successfully triggered by Pull Request!"
-          echo "This is where the code quality checks will run"
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy
+          
+      - name: Run Clang Tidy check
+        run: |
+          echo "Clang tidy checks successfully triggered by Pull Request!"
+          clang-tidy *.cpp -system-headers=0 -- -std=c++17 > clang_report.txt || true
+          USER_WARNINGS=$(grep -c "warning:\|error:" clang_report.txt || true)
+          #total linwa of code
+          TOTAL_LOC=$(find . -type f \( -name "*.cpp" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.h" \) -not -path "*/.*" -exec cat {} + | wc -l)
+
+          if ["$TOTAL_LOC" -eq 0]; then TOTAL_LOC=1; fi
+
+          PENALTY=$(( (USER_WARNINGS * 10000) / TOTAL_LOC ))
+          SCORE=$(( 100 - PENALTY ))
+
+          if [ $SCORE -gt 100 ]; then SCORE=100; fi
+          if [ $SCORE -lt 0 ]; then SCORE=0; fi
+          
+          # 5. Map the relative score to standard grade colors
+          if [ $SCORE -ge 95 ]; then COLOR="brightgreen";
+          elif [ $SCORE -ge 85 ]; then COLOR="green";
+          elif [ $SCORE -ge 70 ]; then COLOR="yellow";
+          else COLOR="red"; fi
+          
+          echo "Calculated Relative Quality Score: $SCORE%"
+          
+          # Save variables for the badge step
+          echo "score=${SCORE}%" >> $GITHUB_OUTPUT
+          echo "color=$COLOR" >> $GITHUB_OUTPUT
+
+      - name: Generate Quality Badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GITHUB_TOKEN }}
+          gistID: '' 
+          repo: ${{ github.event.repository.name }}
+          owner: ${{ github.repository_owner }}
+          namedBadge: quality_badge
+          label: Code Quality
+          message: ${{ steps.linter.outputs.score }}
+          color: ${{ steps.linter.outputs.color }}
