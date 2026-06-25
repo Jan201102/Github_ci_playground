@@ -18,5 +18,5 @@ jobs:
       - name: Run Clang Tidy check
         run: |
           echo "Clang tidy checks successfully triggered by Pull Request!"
-          clang-tidy -checks='*' *.cpp -- -std=c++17 || true
+          clang-tidy -checks='*' -system-headers=0 *.cpp -- -std=c++17 || true
           echo "Scan complete! Check the logs above for any warnings."
