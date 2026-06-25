@@ -1,0 +1,17 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Run a placeholder check
+        run: |
+          echo "Github Action successfully triggered by Pull Request!"
+          echo "This is where the code quality checks will run"
